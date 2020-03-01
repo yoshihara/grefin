@@ -26,7 +26,8 @@ fn find_files_in_directory(query: &str, dir: &str) {
         }
     }
 }
-#[derive(Debug)]
+
+#[derive(Debug,PartialEq)]
 pub struct Config {
     pub query: String,
     pub path: String,
@@ -39,5 +40,24 @@ impl Config {
         } else {
             Err("not enough argument")
         }
+    }
+}
+
+#[cfg(test)]
+mod test_config {
+    use super::*;
+
+    #[test]
+    fn test_new_with_enough_arguments() {
+        let args = vec!("/path/to/executable".to_string(), "query".to_string(), "path".to_string());
+
+        assert_eq!(Ok(Config { query: "query".to_string(), path: "path".to_string()}), Config::new(&args));
+    }
+
+    #[test]
+    fn test_new_without_enough_arguments() {
+        let args = vec!("query".to_string());
+
+        assert!(Config::new(&args).is_err());
     }
 }
