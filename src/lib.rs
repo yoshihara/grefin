@@ -2,10 +2,11 @@ use std::fs;
 use std::io::{self, Write};
 
 pub fn run(config: Config) -> Result<(), String> {
-    find_files(config)
+    find_files(&config)?;
+    grep(&config)
 }
 
-fn find_files(config: Config) -> Result<(), String> {
+fn find_files(config: &Config) -> Result<(), String> {
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
 
@@ -39,6 +40,10 @@ fn find_files_in_directory<W: Write>(w: &mut W, query: &str, dir: &str) -> Resul
             }
         }
     }
+    Ok(())
+}
+
+fn grep(_config: &Config) -> Result<(), String> {
     Ok(())
 }
 
