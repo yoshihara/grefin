@@ -21,7 +21,8 @@ fn find_files_in_directory<W: Write>(w: &mut W, query: &str, dir: &str) -> Resul
             let path_str = path.to_str().unwrap();
 
             if let Some(filename) = path.file_name() {
-                let filename_str = filename.to_str().unwrap();
+                let filename_str = filename.to_str().ok_or("converting path error".to_string())?;
+
                 if filename_str == ".git" {
                     continue;
                 } else if path.is_dir() {
