@@ -12,15 +12,15 @@ fn find_files_in_directory(query: &str, dir: &str) {
     for entry in fs::read_dir(dir).expect("Failed to read directory") {
         if let Ok(entry) = entry {
             let path = entry.path();
-            if let Some(x) = path.to_str() {
-                if x.ends_with(".git") {
+            if let Some(path_str) = path.to_str() {
+                if path_str.ends_with(".git") {
                     continue;
                 } else if path.is_dir() {
-                    find_files_in_directory(query, x)
+                    find_files_in_directory(query, path_str)
                 } else {
                     // TODO
-                    if x.contains(query) {
-                        println!("found {}!", x);
+                    if path_str.contains(query) {
+                        println!("found {}!", path_str);
                    }
                 }
             }
