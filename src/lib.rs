@@ -13,7 +13,9 @@ fn find_files(config: Config) -> Result<(), String> {
 }
 
 fn find_files_in_directory<W: Write>(w: &mut W, query: &str, dir: &str) -> Result<(), String>{
-    for entry in fs::read_dir(dir).expect("Failed to read directory") {
+    let entries = fs::read_dir(dir).map_err(|e| format!("{}: {}", dir, e))?;
+
+    for entry in entries {
         if let Ok(entry) = entry {
             let path = entry.path();
             let path_str = path.to_str().unwrap();
@@ -106,4 +108,10 @@ fn test_find_files_in_directory_with_found_dir() {
     assert!(find_files_in_directory(&mut output_stub, "bar", "fixtures/").is_ok());
 
     assert_eq!("dirname: fixtures/test/bar\nfilename: fixtures/test/bar/bar.txt\n", String::from_utf8(output_stub).unwrap());
+}
+
+#[test]
+fn test_find_files_in_directory_with_not_existed_dir() {
+    let mut output_stub = Vec::<u8>::new();
+    assert!(find_files_in_directory(&mut output_stub, "bar", "notfound/").is_err());
 }
