@@ -101,7 +101,6 @@ fn test_find_files_in_directory_with_found_upcase() {
     assert_eq!("filename: fixtures/test/foo/FUGA.txt\n", String::from_utf8(output_stub).unwrap());
 }
 
-
 #[test]
 fn test_find_files_in_directory_with_found_dir() {
     let mut output_stub = Vec::<u8>::new();
