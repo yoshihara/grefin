@@ -9,4 +9,5 @@ fn main() {
         process::exit(1);
     });
     println!("{:?}", config);
+    grefin::run(config);
 }

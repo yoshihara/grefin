@@ -1,9 +1,11 @@
-pub fn find_files<T: Into<String>>(name: T, dir: T) {
-    println!("{} in {}", name.into(), dir.into());
+pub fn run(config: Config) {
+    find_files(config);
 }
-// fn find_file2<T>(name: T) where T: Into<String> {
-//     println!("{}", name.into());
-// }
+
+fn find_files(config: Config) {
+    println!("{} in {}", config.query, config.path);
+}
+
 #[derive(Debug)]
 pub struct Config {
     pub query: String,
