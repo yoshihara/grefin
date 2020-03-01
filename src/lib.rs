@@ -13,7 +13,9 @@ fn find_files_in_directory(query: &str, dir: &str) {
         if let Ok(entry) = entry {
             let path = entry.path();
             if let Some(x) = path.to_str() {
-                if path.is_dir() {
+                if x.ends_with(".git") {
+                    continue;
+                } else if path.is_dir() {
                     find_files_in_directory(query, x)
                 } else {
                     // TODO
