@@ -1,7 +1,7 @@
 use std::fs;
 use std::io::{self, Write};
 
-pub fn run(config: Config) -> Result<(), String>{
+pub fn run(config: Config) -> Result<(), String> {
     find_files(config)
 }
 
