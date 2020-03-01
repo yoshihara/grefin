@@ -1,34 +1,43 @@
 use std::fs;
 use std::io::{self, Write};
 
-pub fn run(config: Config) {
-    find_files(config);
+pub fn run(config: Config) -> Result<(), String>{
+    find_files(config)
 }
 
-fn find_files(config: Config) {
+fn find_files(config: Config) -> Result<(), String> {
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
 
-    find_files_in_directory(&mut stdout, &config.query, &config.path);
+    find_files_in_directory(&mut stdout, &config.query, &config.path)
 }
 
-fn find_files_in_directory<W: Write>(w: &mut W, query: &str, dir: &str) {
+fn find_files_in_directory<W: Write>(w: &mut W, query: &str, dir: &str) -> Result<(), String>{
     for entry in fs::read_dir(dir).expect("Failed to read directory") {
         if let Ok(entry) = entry {
             let path = entry.path();
-            if let Some(path_str) = path.to_str() {
-                if path_str.ends_with(".git") {
+            let path_str = path.to_str().unwrap();
+
+            if let Some(filename) = path.file_name() {
+                let filename_str = filename.to_str().unwrap();
+                if filename_str == ".git" {
                     continue;
                 } else if path.is_dir() {
-                    find_files_in_directory(w, query, path_str)
+                    if filename_str.to_ascii_lowercase().contains(query) {
+                        writeln!(w, "dirname: {}", path_str).expect("output error");
+                    }
+                    if let Err(err) = find_files_in_directory(w, query, path_str) {
+                        return Err(err);
+                    }
                 } else {
-                    if path_str.to_ascii_lowercase().contains(query) {
+                    if filename_str.to_ascii_lowercase().contains(query) {
                         writeln!(w, "filename: {}", path_str).expect("output error");
                    }
                 }
             }
         }
     }
+    Ok(())
 }
 
 #[derive(Debug,PartialEq)]
@@ -69,7 +78,7 @@ mod test_config {
 #[test]
 fn test_find_files_in_directory_with_found() {
     let mut output_stub = Vec::<u8>::new();
-    find_files_in_directory(&mut output_stub, "hoge", "fixtures/");
+    assert!(find_files_in_directory(&mut output_stub, "hoge", "fixtures/").is_ok());
 
     assert_eq!(String::from_utf8(output_stub).unwrap(), "filename: fixtures/test/foo/hoge.txt\n");
 }
@@ -77,7 +86,7 @@ fn test_find_files_in_directory_with_found() {
 #[test]
 fn test_find_files_in_directory_without_found() {
     let mut output_stub = Vec::<u8>::new();
-    find_files_in_directory(&mut output_stub, "notfound", "fixtures/");
+    assert!(find_files_in_directory(&mut output_stub, "notfound", "fixtures/").is_ok());
 
     assert_eq!(String::from_utf8(output_stub).unwrap(), "");
 }
@@ -85,7 +94,7 @@ fn test_find_files_in_directory_without_found() {
 #[test]
 fn test_find_files_in_directory_with_found_upcase() {
     let mut output_stub = Vec::<u8>::new();
-    find_files_in_directory(&mut output_stub, "fuga", "fixtures/");
+    assert!(find_files_in_directory(&mut output_stub, "fuga", "fixtures/").is_ok());
 
     assert_eq!(String::from_utf8(output_stub).unwrap(), "filename: fixtures/test/foo/FUGA.txt\n");
 }
@@ -94,7 +103,7 @@ fn test_find_files_in_directory_with_found_upcase() {
 #[test]
 fn test_find_files_in_directory_with_found_dir() {
     let mut output_stub = Vec::<u8>::new();
-    find_files_in_directory(&mut output_stub, "foo", "fixtures/");
+    assert!(find_files_in_directory(&mut output_stub, "bar", "fixtures/").is_ok());
 
-    assert_eq!(String::from_utf8(output_stub).unwrap(), "filename: fixtures/test/foo/FUGA.txt\nfilename: fixtures/test/foo/hoge.txt\n");
+    assert_eq!("dirname: fixtures/test/bar\nfilename: fixtures/test/bar/bar.txt\n", String::from_utf8(output_stub).unwrap());
 }

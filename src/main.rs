@@ -9,5 +9,8 @@ fn main() {
         process::exit(1);
     });
     println!("{:?}", config);
-    grefin::run(config);
+    if let Err(err) = grefin::run(config) {
+        println!("{}", err);
+        process::exit(1);
+    };
 }
