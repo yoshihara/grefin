@@ -77,40 +77,45 @@ mod test_config {
     }
 }
 
-#[test]
-fn test_find_files_in_directory_with_found() {
-    let mut output_stub = Vec::<u8>::new();
-    assert!(find_files_in_directory(&mut output_stub, "hoge", "fixtures/").is_ok());
+#[cfg(test)]
+mod test_find_files_in_directory {
+    use super::*;
 
-    assert_eq!("filename: fixtures/test/foo/hoge.txt\n", String::from_utf8(output_stub).unwrap());
-}
+    #[test]
+    fn test_found_file() {
+        let mut output_stub = Vec::<u8>::new();
+        assert!(find_files_in_directory(&mut output_stub, "hoge", "fixtures/").is_ok());
 
-#[test]
-fn test_find_files_in_directory_without_found() {
-    let mut output_stub = Vec::<u8>::new();
-    assert!(find_files_in_directory(&mut output_stub, "notfound", "fixtures/").is_ok());
+        assert_eq!("filename: fixtures/test/foo/hoge.txt\n", String::from_utf8(output_stub).unwrap());
+    }
 
-    assert_eq!("", String::from_utf8(output_stub).unwrap());
-}
+    #[test]
+    fn test_not_found() {
+        let mut output_stub = Vec::<u8>::new();
+        assert!(find_files_in_directory(&mut output_stub, "notfound", "fixtures/").is_ok());
 
-#[test]
-fn test_find_files_in_directory_with_found_upcase() {
-    let mut output_stub = Vec::<u8>::new();
-    assert!(find_files_in_directory(&mut output_stub, "fuga", "fixtures/").is_ok());
+        assert_eq!("", String::from_utf8(output_stub).unwrap());
+    }
 
-    assert_eq!("filename: fixtures/test/foo/FUGA.txt\n", String::from_utf8(output_stub).unwrap());
-}
+    #[test]
+    fn test_found_upcase_file() {
+        let mut output_stub = Vec::<u8>::new();
+        assert!(find_files_in_directory(&mut output_stub, "fuga", "fixtures/").is_ok());
 
-#[test]
-fn test_find_files_in_directory_with_found_dir() {
-    let mut output_stub = Vec::<u8>::new();
-    assert!(find_files_in_directory(&mut output_stub, "bar", "fixtures/").is_ok());
+        assert_eq!("filename: fixtures/test/foo/FUGA.txt\n", String::from_utf8(output_stub).unwrap());
+    }
 
-    assert_eq!("dirname: fixtures/test/bar\nfilename: fixtures/test/bar/bar.txt\n", String::from_utf8(output_stub).unwrap());
-}
+    #[test]
+    fn test_found_dir() {
+        let mut output_stub = Vec::<u8>::new();
+        assert!(find_files_in_directory(&mut output_stub, "bar", "fixtures/").is_ok());
 
-#[test]
-fn test_find_files_in_directory_with_not_existed_dir() {
-    let mut output_stub = Vec::<u8>::new();
-    assert!(find_files_in_directory(&mut output_stub, "bar", "notfound/").is_err());
+        assert_eq!("dirname: fixtures/test/bar\nfilename: fixtures/test/bar/bar.txt\n", String::from_utf8(output_stub).unwrap());
+    }
+
+    #[test]
+    fn test_not_existed_dir_as_path() {
+        let mut output_stub = Vec::<u8>::new();
+        assert!(find_files_in_directory(&mut output_stub, "bar", "notfound/").is_err());
+    }
 }
