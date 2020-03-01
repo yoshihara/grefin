@@ -18,7 +18,6 @@ fn find_files_in_directory<W: Write>(w: &mut W, query: &str, dir: &str) -> Resul
     for entry in entries {
         if let Ok(entry) = entry {
             let path = entry.path();
-            let path_str = path.to_str().unwrap();
 
             if let Some(filename) = path.file_name() {
                 let filename_str = filename.to_str().ok_or("converting path error".to_string())?;
@@ -27,14 +26,14 @@ fn find_files_in_directory<W: Write>(w: &mut W, query: &str, dir: &str) -> Resul
                     continue;
                 } else if path.is_dir() {
                     if filename_str.to_ascii_lowercase().contains(query) {
-                        writeln!(w, "dirname: {}", path_str).expect("output error");
+                        writeln!(w, "dirname: {}", path.display()).expect("output error");
                     }
-                    if let Err(err) = find_files_in_directory(w, query, path_str) {
+                    if let Err(err) = find_files_in_directory(w, query, path.to_str().ok_or("converting path error".to_string())?) {
                         return Err(err);
                     }
                 } else {
                     if filename_str.to_ascii_lowercase().contains(query) {
-                        writeln!(w, "filename: {}", path_str).expect("output error");
+                        writeln!(w, "filename: {}", path.display()).expect("output error");
                    }
                 }
             }
