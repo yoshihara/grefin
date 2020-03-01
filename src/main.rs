@@ -8,7 +8,7 @@ fn main() {
         println!("{}", err);
         process::exit(1);
     });
-    println!("{:?}", config);
+
     if let Err(err) = grefin::run(config) {
         println!("{}", err);
         process::exit(1);
