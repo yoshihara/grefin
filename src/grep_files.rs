@@ -43,3 +43,23 @@ fn grep_files_in_directory<W: Write>(w: &mut W, query: &str, dir: &str) -> Resul
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod test_grep_files_in_directory {
+    use super::*;
+
+    #[test]
+    fn test_hit_file() {
+        let mut output_stub = Vec::<u8>::new();
+        assert!(grep_files_in_directory(&mut output_stub, "This is test", "fixtures/").is_ok());
+
+        assert_eq!("fixtures/test/bar/bar.txt:1: This is test text for grep files.\n", String::from_utf8(output_stub).unwrap());
+    }
+
+    #[test]
+    fn test_hit_no_file() {
+        let mut output_stub = Vec::<u8>::new();
+        assert!(grep_files_in_directory(&mut output_stub, "no hit", "fixtures/").is_ok());
+
+        assert_eq!("", String::from_utf8(output_stub).unwrap());
+    }
