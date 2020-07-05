@@ -29,12 +29,12 @@ fn grep_files_in_directory<W: Write>(w: &mut W, query: &str, dir: &str, ignored_
                     let mut f = File::open(path.as_os_str()).expect("file not found");
                     let mut contents = String::new();
                     let mut count = 0;
-                    f.read_to_string(&mut contents)
-                        .expect("something went wrong reading the file");
-                    for line in contents.lines() {
-                        count += 1;
-                        if line.contains(query) {
-                            writeln!(w, "{}:{}: {}", path.to_str().unwrap(), count, line).expect("output error");
+                    if let Ok(_) = f.read_to_string(&mut contents) { // エラーの場合は単純に無視する（バイナリなど）
+                        for line in contents.lines() {
+                            count += 1;
+                            if line.contains(query) {
+                                writeln!(w, "{}:{}: {}", path.to_str().unwrap(), count, line).expect("output error");
+                            }
                         }
                     }
                 }
